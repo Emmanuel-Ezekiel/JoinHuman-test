@@ -1,47 +1,4 @@
 
-// // Navigate to security credentials page
-// window.location.href = "https://console.aws.amazon.com/iamv2/home?#/security_credentials";
-
-// // Wait for the page to load
-// window.addEventListener("load", function() {
-  
-//   // Click the "Create access key" button
-//   var createKeyButton = document.querySelector(".console-inline-help a");
-//   createKeyButton.click();
-  
-//   // Wait for the modal to appear
-//   setTimeout(function() {
-    
-//     // Check the "I understand" checkbox
-//     var checkbox = document.querySelector("#iam-modal-content input[type='checkbox']");
-//     checkbox.checked = true;
-    
-//     // Click the "Create access key" button
-//     var modalCreateButton = document.querySelector("#iam-modal-content button[type='submit']");
-//     modalCreateButton.click();
-    
-//     // Wait for the keys to be generated
-//     setTimeout(function() {
-      
-//       // Get the access key and secret access key values
-//       var accessKey = document.querySelector(".ak-data .sensitive-data");
-//       var secretAccessKey = document.querySelector(".sk-data .sensitive-data");
-      
-//       // Print the keys to the console
-//       console.log("Access key:", accessKey.textContent.trim());
-//       console.log("Secret access key:", secretAccessKey.textContent.trim());
-      
-//       // Close the modal
-//       var closeButton = document.querySelector("#iam-modal-content button[type='button']");
-//       closeButton.click();
-      
-//     }, 3000); // wait for 3 seconds for keys to be generated
-    
-//   }, 1000); // wait for 1 second for modal to appear
-  
-// });
-
-
 export const IAM_URL = 'https://console.aws.amazon.com/iamv2/home?#/security_credentials';
 
 // Open the IAM dashboard
