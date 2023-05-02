@@ -1,64 +1,37 @@
-import { IAM_URL } from "./Task"
+const https = require('https');
 
-describe('Task.js', () => {
-    test('should create access keys', async () => {
-      // Open IAM dashboard
-      window.open(IAM_URL);
-  
-      // Wait for dashboard to load
-      await new Promise((resolve) => {
-        window.addEventListener('load', () => {
-          resolve();
-        });
+describe('createAccessKey', () => {
+  test('should return access key and secret access key', done => {
+    const options = {
+      hostname: 'iam.amazonaws.com',
+      path: '/?Action=CreateAccessKey&Version=2010-05-08',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    };
+    
+    const body = 'AWSAccessKeyId=YOUR_ACCESS_KEY_ID&Action=CreateAccessKey&UserName=YOUR_USERNAME&Version=2010-05-08&Signature=SIGNATURE';
+    
+    const req = https.request(options, res => {
+      let data = '';
+    
+      res.on('data', chunk => {
+        data += chunk;
       });
-  
-      // Click on account name
-      const accountName = document.querySelector('.awsc-switched-role-info');
-      accountName.click();
-  
-      // Select "Security credentials" from the dropdown menu
-      const securityCredentials = document.querySelector('.awsc-switched-role-menu .nav-item:nth-child(3) a');
-      securityCredentials.click();
-  
-      // Scroll down to the "Access keys" section
-      const accessKeys = document.querySelector('#heading_access_keys');
-      accessKeys.scrollIntoView();
-  
-      // Find the "Create access key" button and click it
-      const createAccessKeyBtn = document.querySelector('#access-keys-create-button');
-      createAccessKeyBtn.click();
-  
-      // Wait for the modal window to appear
-      await new Promise((resolve) => {
-        const modalWindow = document.querySelector('.modal-dialog');
-        modalWindow.addEventListener('load', () => {
-          resolve();
-        });
+    
+      res.on('end', () => {
+        const accessKey = data.match(/<AccessKeyId>(.*?)<\/AccessKeyId>/)[1];
+        const secretKey = data.match(/<SecretAccessKey>(.*?)<\/SecretAccessKey>/)[1];
+        expect(accessKey).toBeDefined();
+        expect(secretKey).toBeDefined();
+        console.log(`Access key: ${accessKey}`);
+        console.log(`Secret access key: ${secretKey}`);
+        done();
       });
-  
-      // Find the checkbox for confirming root access key creation
-      const confirmCheckbox = document.querySelector('#iam-create-root-key-confirm');
-      confirmCheckbox.click();
-  
-      // Click the "Create access key" button
-      const confirmBtn = document.querySelector('#access-keys-create-confirm-button');
-      confirmBtn.click();
-  
-      // Wait for the new access key to be created
-      await new Promise((resolve) => {
-        const accessKeyTable = document.querySelector('#access-keys-table');
-        accessKeyTable.addEventListener('load', () => {
-          resolve();
-        });
-      });
-  
-      // Retrieve the "Access key" and "Secret access key"
-      const accessKey = document.querySelector('#access-keys-access-key-id').textContent;
-      const secretKey = document.querySelector('#access-keys-secret-access-key').textContent;
-  
-      // Assert that the access keys are not empty
-      expect(accessKey.trim()).not.toBe('');
-      expect(secretKey.trim()).not.toBe('');
     });
+    
+    req.write(body);
+    req.end();
   });
-  
+});
