@@ -49,43 +49,23 @@
 
 //The URL https://console.aws.amazon.com/iamv2/home?#/security_credentials is the AWS IAM dashboard page for managing security credentials. 
 
-const https = require('https');
-// To create an access key and secret key using HTTP requests, you can send a POST request to the AWS IAM API endpoint https://iam.amazonaws.com/ with the Action parameter set to CreateAccessKey.
 // Set up HTTP request options
 const options = {
-  hostname: 'iam.amazonaws.com',
-  path: '/?Action=CreateAccessKey&Version=2010-05-08',
   method: 'POST',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
-  }
+  },
+  body: 'AWSAccessKeyId=YOUR_ACCESS_KEY_ID&Action=CreateAccessKey&UserName=YOUR_USERNAME&Version=2010-05-08&Signature=SIGNATURE'
 };
 
-
-
-// Set up HTTP request body
-const body = 'AWSAccessKeyId=YOUR_ACCESS_KEY_ID&Action=CreateAccessKey&UserName=YOUR_USERNAME&Version=2010-05-08&Signature=SIGNATURE';
-
 // Set up HTTP request
-const req = https.request(options, res => {
-  let data = '';
-
-  // Concatenate response data
-  res.on('data', chunk => {
-    data += chunk;
-  });
-
-  // Log access key and secret access key to console
-  res.on('end', () => {
+fetch('https://iam.amazonaws.com/?Action=CreateAccessKey&Version=2010-05-08', options)
+  .then(response => response.text())
+  .then(data => {
     const accessKey = data.match(/<AccessKeyId>(.*?)<\/AccessKeyId>/)[1];
     const secretKey = data.match(/<SecretAccessKey>(.*?)<\/SecretAccessKey>/)[1];
     console.log(`Access key: ${accessKey}`);
     console.log(`Secret access key: ${secretKey}`);
-  });
-});
+  })
+  .catch(error => console.error(error));
 
-// Send HTTP request body
-req.write(body);
-
-// End HTTP request
-req.end();

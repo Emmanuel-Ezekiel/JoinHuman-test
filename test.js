@@ -1,37 +1,26 @@
-const https = require('https');
+const fetch = require('node-fetch');
 
-describe('createAccessKey', () => {
-  test('should return access key and secret access key', done => {
+describe('CreateAccessKey', () => {
+  it('should create an access key and secret key', async () => {
+    // Set up HTTP request options
     const options = {
-      hostname: 'iam.amazonaws.com',
-      path: '/?Action=CreateAccessKey&Version=2010-05-08',
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
-      }
+      },
+      body: 'AWSAccessKeyId=YOUR_ACCESS_KEY_ID&Action=CreateAccessKey&UserName=YOUR_USERNAME&Version=2010-05-08&Signature=SIGNATURE'
     };
-    
-    const body = 'AWSAccessKeyId=YOUR_ACCESS_KEY_ID&Action=CreateAccessKey&UserName=YOUR_USERNAME&Version=2010-05-08&Signature=SIGNATURE';
-    
-    const req = https.request(options, res => {
-      let data = '';
-    
-      res.on('data', chunk => {
-        data += chunk;
-      });
-    
-      res.on('end', () => {
-        const accessKey = data.match(/<AccessKeyId>(.*?)<\/AccessKeyId>/)[1];
-        const secretKey = data.match(/<SecretAccessKey>(.*?)<\/SecretAccessKey>/)[1];
-        expect(accessKey).toBeDefined();
-        expect(secretKey).toBeDefined();
-        console.log(`Access key: ${accessKey}`);
-        console.log(`Secret access key: ${secretKey}`);
-        done();
-      });
-    });
-    
-    req.write(body);
-    req.end();
+
+    // Send HTTP request
+    const response = await fetch('https://iam.amazonaws.com/?Action=CreateAccessKey&Version=2010-05-08', options);
+
+    // Extract access key and secret access key from response
+    const text = await response.text();
+    const accessKey = text.match(/<AccessKeyId>(.*?)<\/AccessKeyId>/)[1];
+    const secretKey = text.match(/<SecretAccessKey>(.*?)<\/SecretAccessKey>/)[1];
+
+    // Check if access key and secret access key are defined
+    expect(accessKey).toBeDefined();
+    expect(secretKey).toBeDefined();
   });
 });
